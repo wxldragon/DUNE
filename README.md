@@ -1,9 +1,9 @@
 # DUNE
-The official implementation of our ICML 2026 paper "*[Dual-branch Robust Unlearnable Examples](https://arxiv.org/pdf/)*", by *[Xianlong Wang](https://wxldragon.github.io/), [Hangtao Zhang](https://scholar.google.com.hk/citations?user=H6wMyNEAAAAJ&hl=zh-CN), Wenbo Pan, [Ziqi Zhou](https://zhou-zi7.github.io/), Changsong Jiang, Li Zeng, and [Xiaohua Jia](https://www.cs.cityu.edu.hk/~jia/).*
+The official implementation of our ICML 2026 paper "*[Dual-branch Robust Unlearnable Examples](https://arxiv.org/pdf/)*", by *[Xianlong Wang](https://wxldragon.github.io/), [Hangtao Zhang](https://scholar.google.com.hk/citations?user=H6wMyNEAAAAJ&hl=zh-CN), [Wenbo Pan](https://www.wenbo.io/zh-CN/), [Ziqi Zhou](https://zhou-zi7.github.io/), Changsong Jiang, Li Zeng, and [Xiaohua Jia](https://www.cs.cityu.edu.hk/~jia/).*
 
-![ICML 2026](https://img.shields.io/badge/NeurIPS-2024-blue.svg?style=plastic) 
+![ICML 2026](https://img.shields.io/badge/ICML-2026-blue.svg?style=plastic) 
 ![Unlearnable Examples](https://img.shields.io/badge/Unlearnable-Examples-yellow.svg?style=plastic)
-![Robustness](https://img.shields.io/badge/Point-Clouds-orange.svg?style=plastic)
+![Robustness](https://img.shields.io/badge/Robustness-orange.svg?style=plastic)
  
 
 
