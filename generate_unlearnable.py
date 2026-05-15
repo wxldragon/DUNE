@@ -19,23 +19,23 @@ import time
 start_time = time.time()
 
 
-# 创建DataLoader
+
 def create_dataloader_for_class(class_idx, batch_size):
     class_indices = [i for i, (_, label) in enumerate(cifar10_train) if label == class_idx]
     subset = Subset(cifar10_train, class_indices)
     dataloader = DataLoader(subset, batch_size=batch_size, shuffle=False, num_workers=4)
     return dataloader
 
-# 定义触发器应用函数
+
 def apply_trigger(imgs, trigger):
     trigger = trigger.to(imgs.device)
     poi_imgs = imgs + trigger
     poi_imgs = torch.clamp(poi_imgs, 0, 1)
     return poi_imgs
 
-# 定义自然性限制的惩罚函数
+
 def calculate_penalty(poisoned_image, clean_image, lambda_values, lpips_model):
-    # pdb.set_trace() 
+
     poisoned_image_np = poisoned_image.squeeze().cpu().numpy().transpose(1, 2, 0)
     clean_image_np = clean_image.squeeze().cpu().numpy().transpose(1, 2, 0)
     psnr_val = psnr(clean_image_np, poisoned_image_np, data_range=1)
@@ -47,24 +47,24 @@ def calculate_penalty(poisoned_image, clean_image, lambda_values, lpips_model):
     penalty = e1 + e2 + e3
 
 
-    # penalty = 0 # w/o the visual loss
+
 
     return penalty
 
- 
 
- 
+
+
 def color_shift_optimization(dataloader, net, ckpt, num_class, class_idx, lambda1, lambda2, lambda3,  permutation_offset, dim=3, num_particles=10, max_iter=10):
-    position = np.random.rand(num_particles, dim) * 0.2 - 0.1  # 初始化粒子的位置
-    velocity = np.random.rand(num_particles, dim) * 0.02 - 0.01  # 初始化粒子的速度
+    position = np.random.rand(num_particles, dim) * 0.2 - 0.1
+    velocity = np.random.rand(num_particles, dim) * 0.02 - 0.01
     personal_best_position = np.copy(position)
     personal_best_value = np.array([float('inf')] * num_particles)
     global_best_value = float('inf')
     global_best_position = np.zeros(dim)
     for i in range(max_iter):
         for j in range(num_particles):
- 
-            """Loss Function to Optimize Color Shift"""           
+
+
             adv_loss, vis_loss = 0, 0
             for imgs, _ in dataloader:
                 size = imgs.size(0)
@@ -83,7 +83,7 @@ def color_shift_optimization(dataloader, net, ckpt, num_class, class_idx, lambda
                 for poisoned_img, clean_img in zip(poi_imgs, imgs):
                     penalty = calculate_penalty(poisoned_img.unsqueeze(0), clean_img.unsqueeze(0), [lambda1, lambda2, lambda3], lpips_model)
                     vis_loss += penalty
-                break       #只用第一个batch的images求the best color shift
+                break
             total_loss = adv_loss + vis_loss
             current_value = total_loss / size
 
@@ -97,29 +97,29 @@ def color_shift_optimization(dataloader, net, ckpt, num_class, class_idx, lambda
         position += velocity
     return global_best_position
 
- 
-# def color_shift_optimization(  total_loss, dim=3, num_particles=10, max_iter=10):
-#     position = np.random.rand(num_particles, dim) * 0.2 - 0.1  # 初始化粒子的位置
-#     velocity = np.random.rand(num_particles, dim) * 0.02 - 0.01  # 初始化粒子的速度
-#     personal_best_position = np.copy(position)
-#     personal_best_value = np.array([float('inf')] * num_particles)
-#     global_best_value = float('inf')
-#     global_best_position = np.zeros(dim)
-#     for i in range(max_iter):
-#         for j in range(num_particles):
- 
-#             """Loss Function to Optimize Color Shift"""           
-#              current_value = total_loss / size
 
-#             if current_value < personal_best_value[j]:
-#                 personal_best_value[j] = current_value
-#                 personal_best_position[j] = position[j]
-#             if current_value < global_best_value:
-#                 global_best_value = current_value
-#                 global_best_position = position[j]
-#         velocity = 0.5 * velocity + 0.3 * (personal_best_position - position) + 0.3 * (global_best_position - position)
-#         position += velocity
-#     return global_best_position
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def valid_test(inputs, targets, net, inputs_c, num_class, permutation_offset):
@@ -143,36 +143,36 @@ def save_to_pkl(data_list, ue_output_dir, ue_name):
     with open(file_path, "wb") as f:
         pickle.dump(data_list, f)
 
- 
- 
 
 
- 
+
+
+
 def get_args():
-    parser = argparse.ArgumentParser() 
+    parser = argparse.ArgumentParser()
     parser.add_argument('--model', type=str, default='ResNet18')
-    parser.add_argument('--lr', type=float, default=0.1)     
-    
-    parser.add_argument('--dataset', type=str, default='cifar10') 
-    
+    parser.add_argument('--lr', type=float, default=0.1)
+
+    parser.add_argument('--dataset', type=str, default='cifar10')
+
     parser.add_argument('--seed', type=int, default=0)
     parser.add_argument('--eps', type=int, default=8)
-    
-    parser.add_argument('--colorshift', action='store_true', default=False, help="only using colorshift") 
-    parser.add_argument('--adv', action='store_true', default=False, help="only using adv") 
-    parser.add_argument('--ours', action='store_true', default=False, help="using our scheme")     
-    parser.add_argument('--lambda1', type=float, default=20) 
-    parser.add_argument('--lambda2', type=float, default=0.80) 
-    parser.add_argument('--lambda3', type=float, default=0.03) 
+
+    parser.add_argument('--colorshift', action='store_true', default=False, help="only using colorshift")
+    parser.add_argument('--adv', action='store_true', default=False, help="only using adv")
+    parser.add_argument('--ours', action='store_true', default=False, help="using our scheme")
+    parser.add_argument('--lambda1', type=float, default=20)
+    parser.add_argument('--lambda2', type=float, default=0.80)
+    parser.add_argument('--lambda3', type=float, default=0.03)
     parser.add_argument('--permutation_offset', type=int, default=3)
 
     parser.add_argument('--gpuid', type=str, default='0')
     parser.add_argument('--imagenet100_path', type=str, default='./data/imagenet100')
 
-    parser.add_argument('--num_model', type=int, default=5)     # 1    3    5    7
-    parser.add_argument('--alpha', type=float, default=0.5)     #0.5  1.0  1.5  2.0
-    parser.add_argument('--batch', type=int, default=1000)      #500  1000 1500 2000
-    parser.add_argument('--num_step', type=int, default=30)     #20   25  30  35
+    parser.add_argument('--num_model', type=int, default=5)
+    parser.add_argument('--alpha', type=float, default=0.5)
+    parser.add_argument('--batch', type=int, default=1000)
+    parser.add_argument('--num_step', type=int, default=30)
     args = parser.parse_args()
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
@@ -181,7 +181,7 @@ def get_args():
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
     return args
- 
+
 if __name__ == '__main__':
     args = get_args()
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpuid
@@ -197,9 +197,9 @@ if __name__ == '__main__':
         cifar10_train = datasets.CIFAR10(root='./data', train=True, download=True, transform=transforms.Compose([transforms.ToTensor(),]))
         net = get_model(args.model, num_of_classes=num_of_classes, dataset=args.dataset).cuda()
 
-        #choose ckpts    
+
         ckpts = [ckpt_path + "/" + x for x in os.listdir(ckpt_path) if 's2-e' in x]
-        ckpts.sort(key=lambda x: int(x.split('-')[2][1:]))  #26 ckpts' paths
+        ckpts.sort(key=lambda x: int(x.split('-')[2][1:]))
         if len(ckpts) < args.num_model:
             raise ValueError(
                 f"Need at least {args.num_model} checkpoints in {ckpt_path}, "
@@ -212,7 +212,7 @@ if __name__ == '__main__':
             used_ckpts = ckpts[interval - dev::interval]
             dev += 1
         print(used_ckpts)
-        # exit(-1)
+
 
 
     elif args.dataset == 'cifar100':
@@ -236,7 +236,7 @@ if __name__ == '__main__':
             transform=transforms.ToTensor(),
         )
         imagenet_train.class_to_idx = class_to_idx
-        imagenet_train.samples = [(p, class_to_idx[os.path.basename(os.path.dirname(p))]) 
+        imagenet_train.samples = [(p, class_to_idx[os.path.basename(os.path.dirname(p))])
                                  for p, _ in imagenet_train.samples]
 
         print("train_class_id:", imagenet_train.class_to_idx)
@@ -248,8 +248,8 @@ if __name__ == '__main__':
 
     criterion = nn.CrossEntropyLoss()
     eps, alpha = args.eps / 255, args.alpha / 255
-    
- 
+
+
     ue_output_dir = os.path.join('./UEs', args.dataset)
     if not os.path.exists(ue_output_dir):
         os.makedirs(ue_output_dir)
@@ -263,19 +263,19 @@ if __name__ == '__main__':
         elif args.dataset == 'imagenet100':
             indices = [i for i, (_, y) in enumerate(imagenet_train.samples) if y == class_idx]
             subset = Subset(imagenet_train, indices)
-            dataloader = DataLoader(subset, batch_size=args.batch, shuffle=True)            
+            dataloader = DataLoader(subset, batch_size=args.batch, shuffle=True)
 
-        if args.colorshift or args.ours:   #module A or module A+B
+        if args.colorshift or args.ours:
             best_trigger = color_shift_optimization(dataloader, net, used_ckpts, num_of_classes,  class_idx, args.lambda1, args.lambda2, args.lambda3,  args.permutation_offset)
             trigger = torch.tensor(best_trigger, dtype=torch.float32).view(1, 3, 1, 1).cuda()
             print(f"Best trigger for class {class_idx}: {best_trigger}")
-            
+
         for batch_idx, (imgs, _) in enumerate(dataloader):
             imgs = imgs.cuda()
             targets = torch.tensor([class_idx] * imgs.size(0), dtype=torch.long).cuda()
-            if args.colorshift:     
+            if args.colorshift:
                 unl_samples = apply_trigger(imgs, trigger)
-                save_img_tag = "colorshift"        
+                save_img_tag = "colorshift"
             elif args.adv or args.ours:
                 unl_samples = None
                 for i in range(args.num_step):
@@ -283,9 +283,9 @@ if __name__ == '__main__':
                     for ckpt in used_ckpts:
                         net.load_state_dict(torch.load(ckpt)['net'])
 
-                        # total_params = sum(p.numel() for p in net.parameters())
-                        # print(total_params)
-                        # exit(-1)
+
+
+
 
                         unl_samples, grad = valid_test(imgs, targets, net, unl_samples, num_of_classes, args.permutation_offset)
                         grads.append(grad)
@@ -293,8 +293,8 @@ if __name__ == '__main__':
                         inputs_ori = unl_samples.detach().cpu().clone()
                     grad_avg = sum(grads) / len(grads)
                     perturbed_imgs = torch.min(torch.max(unl_samples - grad_avg.sign() * alpha, inputs_ori - eps), inputs_ori + eps)
- 
-                    unl_samples = torch.clamp(perturbed_imgs, 0.0, 1.0)                
+
+                    unl_samples = torch.clamp(perturbed_imgs, 0.0, 1.0)
                 if args.adv:
                     save_img_tag = "ensadv"
                 else:
@@ -304,31 +304,31 @@ if __name__ == '__main__':
             if args.dataset == 'imagenet100':
                 ue_output_dir = os.path.join('./UEs/imagenet100', str(class_idx))
                 if not os.path.exists(ue_output_dir):
-                    os.makedirs(ue_output_dir)   
+                    os.makedirs(ue_output_dir)
                 for _, img_tensor in enumerate(unl_samples):
-                    img = torchvision.transforms.ToPILImage()(img_tensor)    
+                    img = torchvision.transforms.ToPILImage()(img_tensor)
                     img_idx = len(os.listdir(ue_output_dir))
                     img.save(os.path.join(ue_output_dir, f"{img_idx}.png"))
-                    # if cnt < 100:
-                    #     clean_img = torchvision.transforms.ToPILImage()(imgs[cnt])
-                    #     clean_img.save(os.path.join("./1-vis-imagenet", f"{img_idx}_clean.png"))
-                    #     img.save(os.path.join("./1-vis-imagenet", f"{img_idx}.png"))
-                    #     cnt += 1
+
+
+
+
+
             else:
-                # if batch_idx == 0:
-                #     if class_idx == 0 or class_idx == 1 or class_idx == 3:
-                #         save_image(imgs[0], "./vis-img/" + "clean_class" + str(class_idx) + "_"+ str(len(os.listdir("./vis-img"))) +".png")
-                #         save_image(unl_samples[0], "./vis-img/" + save_img_tag + "_class" + str(class_idx) + "_"+ str(len(os.listdir("./vis-img"))) +".png")
+
+
+
+
                 samples = unl_samples.cpu().numpy()
-                dataset_list += [(samples[k], class_idx) for k in range(len(samples))]       
-                print(f"Processed all images for batch {batch_idx}")       
+                dataset_list += [(samples[k], class_idx) for k in range(len(samples))]
+                print(f"Processed all images for batch {batch_idx}")
 
 
     if args.dataset == 'cifar10':
-        ue_name =  save_img_tag + "_" + str(args.num_model) +  "_" + str(args.alpha) +  "_" + str(args.batch) +  "_" + str(args.num_step)  
+        ue_name =  save_img_tag + "_" + str(args.num_model) +  "_" + str(args.alpha) +  "_" + str(args.batch) +  "_" + str(args.num_step)
         save_to_pkl(dataset_list, ue_output_dir, ue_name)
         print("Successfully Dumped in Pickle File!")
-    # else:
+
     end_time = time.time()
     print(f"The total running time is: {(end_time - start_time) / 3600:.4f} hours")
- 
+

@@ -18,10 +18,10 @@ def unpickle(filename):
 transform_train = transforms.Compose([
     transforms.RandomCrop(32, padding=4),
     transforms.RandomHorizontalFlip(),
-    transforms.ToTensor()  # 会将数据归一化0-1
+    transforms.ToTensor()
 ])
 transform_valid = transforms.Compose([
-    transforms.ToTensor()  # 会将数据归一化0-1
+    transforms.ToTensor()
 ])
 
 
@@ -30,14 +30,14 @@ class TrainDatasetCifar10(Dataset):
         datas = [unpickle('data/cifar10/data_batch_{}'.format(i + 1)) for i in range(5)]
         self.data_ori = np.concatenate([i[b'data'] for i in datas], axis=0).reshape(50000, 3, 32, 32)
         self.label_ori = np.array([label for labels in [data[b'labels'] for data in datas] for label in labels])
-        #np.random.shuffle(self.label)
+
         self.data = np.concatenate([i[b'data'] for i in datas], axis=0).reshape(50000, 3, 32, 32)
         self.label = np.array([label for labels in [data[b'labels'] for data in datas] for label in labels])
-        """
-        for i in range(10):
-            self.data[i * 5000 : (i+1) * 5000] = self.data_ori[self.label_ori == i]
-            self.label[i * 5000 : (i+1) * 5000] = self.label_ori[self.label_ori == i]
-        #"""
+\
+\
+\
+\
+
         self.transform = transform_valid
 
     def __getitem__(self, index):
@@ -55,12 +55,12 @@ class TrainDatasetCifar10ULE(Dataset):
         self.data = np.concatenate([i[b'data'] for i in datas], axis=0).reshape(50000, 3, 32, 32)
         self.label = np.array([label for labels in [data[b'labels'] for data in datas] for label in labels])
 
-        """
-        import PIL.Image
-        for i in range(20):
-            PIL.Image.fromarray((self.data[i].transpose((1, 2, 0))).astype(np.uint8)).resize((224, 224)).save('vis/ori-%02d.png' % i)
-        exit()
-        """
+\
+\
+\
+\
+\
+
 
         ls = [path + '/' + x for x in os.listdir(path) if 'eps%d' % eps in x]
         ls.sort()
@@ -148,7 +148,7 @@ class TrainDatasetCifar100(Dataset):
 
 
 class TestDatasetCifar100(Dataset):
-    """取每一类前rate比率的测试数据"""
+
 
     def __init__(self):
         dict = unpickle('data/cifar100/test')
@@ -166,13 +166,13 @@ class TestDatasetCifar100(Dataset):
 
 
 def get_data(Train, Test, split_rate, batch_size: int or list, num_workers=4, shuffle=None):
-    trainset = Train(split_rate, int(num_workers)) if isinstance(split_rate, str) else Train()#if split_rate > 0 else Train(-split_rate)
-    split_rate = 1 if isinstance(split_rate, str) else split_rate #np.abs(split_rate) if split_rate != 0 else 1.0
+    trainset = Train(split_rate, int(num_workers)) if isinstance(split_rate, str) else Train()
+    split_rate = 1 if isinstance(split_rate, str) else split_rate
     testset = Test()
     num_workers = num_workers if isinstance(num_workers, int) else 4
     tmp = int(len(trainset) * split_rate)
 
-    #torch.manual_seed(1000)
+
     trainset, validset = torch.utils.data.random_split(trainset, [tmp, len(trainset) - tmp])
     trainset.dataset.transform = transform_train
 
@@ -194,12 +194,12 @@ def get_data(Train, Test, split_rate, batch_size: int or list, num_workers=4, sh
 
 
 def cifar10(split_rate, batch_size: int or list, num_workers=4, shuffle=None):
-    if isinstance(split_rate, str): 
+    if isinstance(split_rate, str):
         return get_data(TrainDatasetCifar10ULE, TestDatasetCifar10, split_rate, batch_size, num_workers=num_workers, shuffle=shuffle)
     return get_data(TrainDatasetCifar10, TestDatasetCifar10, split_rate, batch_size, num_workers=num_workers, shuffle=shuffle)
 
 def cifar100(split_rate, batch_size: int or list, num_workers=4, shuffle=None):
-    if isinstance(split_rate, str): 
+    if isinstance(split_rate, str):
         return get_data(TrainDatasetCifar100ULE, TestDatasetCifar100, split_rate, batch_size, num_workers=num_workers, shuffle=shuffle)
     return get_data(TrainDatasetCifar100, TestDatasetCifar100, split_rate, batch_size, num_workers=num_workers, shuffle=shuffle)
 

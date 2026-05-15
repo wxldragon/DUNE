@@ -6,7 +6,7 @@ import torchvision.transforms as transforms
 from PIL import Image
 import cv2
 import os
-from utils_train import same_seeds, standard_loss, cifar10_training_data, add_random_gaussian_noise 
+from utils_train import same_seeds, standard_loss, cifar10_training_data, add_random_gaussian_noise
 import time
 import warnings
 import argparse
@@ -14,7 +14,7 @@ import numpy as np
 import csv
 from classifiers.resnet import resnet18, resnet50
 from classifiers.vgg import VGG16, VGG19
-from classifiers.densenet import DenseNet121 
+from classifiers.densenet import DenseNet121
 from io import BytesIO
 from scipy.ndimage import map_coordinates
 from madrys import MadrysLoss
@@ -36,10 +36,10 @@ class RandomPixelShift:
         return img_shifted
 
 class RandomGaussianNoise:
-    def __init__(self, max_std=8/255): 
+    def __init__(self, max_std=8/255):
         self.max_std = max_std
 
-    def __call__(self, img): 
+    def __call__(self, img):
         if not torch.is_tensor(img):
             raise TypeError("Input must be a torch.Tensor in [C,H,W] format")
 
@@ -54,12 +54,12 @@ class RandomGaussianNoise:
 
 
 def per_image_channel_normalization(img):
-    """
-    Per-image channel normalization.
-    Input: PIL Image
-    Output: PIL Image
-    """
-    x = np.asarray(img).astype(np.float32)  # HWC, RGB
+\
+\
+\
+\
+
+    x = np.asarray(img).astype(np.float32)
 
     for c in range(3):
         mean = x[:, :, c].mean()
@@ -79,11 +79,11 @@ def per_image_channel_normalization(img):
 
 
 def histogram_equalization(img):
-    """
-    Histogram equalization on each RGB channel separately.
-    Input: PIL Image
-    Output: PIL Image
-    """
+\
+\
+\
+\
+
     x = np.asarray(img).astype(np.uint8)
     out = np.empty_like(x)
 
@@ -94,11 +94,11 @@ def histogram_equalization(img):
 
 
 def lab_whitening(img):
-    """
-    LAB whitening: standardize each LAB channel per image, then map back to [0,255].
-    Input: PIL Image
-    Output: PIL Image
-    """
+\
+\
+\
+\
+
     x = np.asarray(img).astype(np.uint8)
     lab = cv2.cvtColor(x, cv2.COLOR_RGB2LAB).astype(np.float32)
 
@@ -108,7 +108,7 @@ def lab_whitening(img):
         if std < 1e-6:
             std = 1.0
         lab[:, :, c] = (lab[:, :, c] - mean) / std
- 
+
     for c in range(3):
         ch = lab[:, :, c]
         ch_min = ch.min()
@@ -124,11 +124,11 @@ def lab_whitening(img):
 
 
 def yuv_whitening(img):
-    """
-    YUV whitening: standardize each YUV channel per image, then map back to [0,255].
-    Input: PIL Image
-    Output: PIL Image
-    """
+\
+\
+\
+\
+
     x = np.asarray(img).astype(np.uint8)
     yuv = cv2.cvtColor(x, cv2.COLOR_RGB2YUV).astype(np.float32)
 
@@ -138,7 +138,7 @@ def yuv_whitening(img):
         if std < 1e-6:
             std = 1.0
         yuv[:, :, c] = (yuv[:, :, c] - mean) / std
- 
+
     for c in range(3):
         ch = yuv[:, :, c]
         ch_min = ch.min()
@@ -169,7 +169,7 @@ def COIN_trans(image, severity=4):
 
     dx = (np.random.uniform(-alpha, alpha, size=shape[:2])).astype(np.float32)
     dy = (np.random.uniform(-alpha, alpha, size=shape[:2])).astype(np.float32)
- 
+
     if len(image.shape) < 3 or image.shape[2] < 3:
         x, y = np.meshgrid(np.arange(shape[1]), np.arange(shape[0]))
         indices = np.reshape(y + dy, (-1, 1)), np.reshape(x + dx, (-1, 1))
@@ -183,20 +183,20 @@ def COIN_trans(image, severity=4):
 warnings.filterwarnings("ignore")
 parser = argparse.ArgumentParser(description='Training on UEs')
 parser.add_argument('--lr', default=0.1, type=float, help='learning-rate')
-parser.add_argument('--epochs', default=80, type=int, help='number of epoch') 
-parser.add_argument('--arch', default='resnet18', type=str, help='types of training architecture')    
-parser.add_argument('--batch_size', default=128, type=int)   
-parser.add_argument('--seed', default=0, type=int)    
-parser.add_argument('--defense', default='wo', type=str) 
-parser.add_argument('--ue', default='DUNE', type=str, help='UE pickle file name without .pkl')  
+parser.add_argument('--epochs', default=80, type=int, help='number of epoch')
+parser.add_argument('--arch', default='resnet18', type=str, help='types of training architecture')
+parser.add_argument('--batch_size', default=128, type=int)
+parser.add_argument('--seed', default=0, type=int)
+parser.add_argument('--defense', default='wo', type=str)
+parser.add_argument('--ue', default='DUNE', type=str, help='UE pickle file name without .pkl')
 parser.add_argument('--shift', default=8, type=int, help='shift_range')
 parser.add_argument('--std', default=8, type=int, help='std')
 parser.add_argument('--gpu', type=str, default='0')
-args = parser.parse_args() 
+args = parser.parse_args()
 
- 
+
 same_seeds(args.seed)
-gpu_id = int(args.gpu)   # 例如 args.gpu = "0" 或 "1"
+gpu_id = int(args.gpu)
 device = torch.device(f"cuda:{gpu_id}" if torch.cuda.is_available() else "cpu")
 num_classes = 10
 
@@ -212,7 +212,7 @@ elif args.defense == 'gray':
     print("Using Grayscale Transformation")
     transform.transforms.append(transforms.Grayscale(3))
 elif args.defense == 'coin':
-    transform.transforms.append(transforms.Lambda(lambda x: np.uint8(COIN_trans(x)))) 
+    transform.transforms.append(transforms.Lambda(lambda x: np.uint8(COIN_trans(x))))
 elif args.defense == 'jpeggray':
     print("Using JPEG compression + Grayscale Transformation")
     transform.transforms.append(transforms.Lambda(JPEGcompression))
@@ -235,7 +235,7 @@ elif args.defense == 'yuv':
 
 transform.transforms.append(transforms.ToTensor())
 
- 
+
 if args.defense == 'colorGaussian':
     transform.transforms.append(RandomPixelShift(shift_range=args.shift/255))
     transform.transforms.append(RandomGaussianNoise(max_std=args.std/255))
@@ -243,26 +243,26 @@ elif args.defense == 'colorat':
     transform.transforms.append(RandomPixelShift(shift_range=args.shift/255))
 
 ue_dir = args.ue + ".pkl"
-training_data_path = os.path.join("./UEs/cifar10", ue_dir)     #poisoned training data
+training_data_path = os.path.join("./UEs/cifar10", ue_dir)
 if not os.path.isfile(training_data_path):
     raise FileNotFoundError(
         f"UE file not found: {training_data_path}. "
         "Pass --ue with a file name under UEs/cifar10 without the .pkl suffix."
     )
 train_dataset = cifar10_training_data(training_data_path, transform=transform)
-train_loader = torch.utils.data.DataLoader(train_dataset, num_workers=4, batch_size=args.batch_size, shuffle=True) 
+train_loader = torch.utils.data.DataLoader(train_dataset, num_workers=4, batch_size=args.batch_size, shuffle=True)
 
 
-# save_dir = "./debug_training_images"
-# os.makedirs(save_dir, exist_ok=True)
 
-# images, labels = next(iter(train_loader))
 
-# mean = torch.tensor([0.4914, 0.4822, 0.4465]).view(1, 3, 1, 1)
-# std = torch.tensor([0.2023, 0.1994, 0.2010]).view(1, 3, 1, 1)
-# images_vis = torch.clamp(images * std + mean, 0, 1)
 
-# save_image(images_vis[:16], os.path.join(save_dir, "grid.png"), nrow=4)
+
+
+
+
+
+
+
 
 test_dataset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transforms.Compose([transforms.ToTensor(),]))
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=8)
@@ -271,7 +271,7 @@ test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_si
 from torchvision import models
 from torchvision.models import mobilenet_v2
 from torchvision.models.vision_transformer import VisionTransformer
- 
+
 if args.arch == "resnet18":
     net = resnet18(in_dims=3, out_dims=num_classes)
 elif args.arch == "resnet50":
@@ -281,7 +281,7 @@ elif args.arch == "vgg16":
 elif args.arch == "vgg19":
     net = VGG19()
 elif args.arch == "densenet121":
-    net = DenseNet121() 
+    net = DenseNet121()
 elif args.arch == 'mobilenetv2':
     net = mobilenet_v2(num_classes=num_classes)
 elif args.arch == "efficientnet_b0":
@@ -297,7 +297,7 @@ elif args.arch == 'vit-tiny/4':
     dropout=0.1,
     attention_dropout=0.1,
     num_classes=num_classes,
-) 
+)
 elif args.arch == 'vit-small/4':
     net = VisionTransformer(
     image_size=32,
@@ -309,7 +309,7 @@ elif args.arch == 'vit-small/4':
     dropout=0.1,
     attention_dropout=0.1,
     num_classes=num_classes,
-)     
+)
 elif args.arch == 'vit-base/4':
     net = VisionTransformer(
     image_size=32,
@@ -321,7 +321,7 @@ elif args.arch == 'vit-base/4':
     dropout=0.1,
     attention_dropout=0.1,
     num_classes=num_classes,
-)   
+)
 
 
 net = net.to(device)
@@ -335,7 +335,7 @@ for epoch in range(args.epochs):
     correct = 0
     total = 0
     net.train()
-    for i, (inputs, labels) in enumerate(train_loader, 0):       
+    for i, (inputs, labels) in enumerate(train_loader, 0):
         inputs = torch.clamp(inputs, 0, 1)
         labels = labels.long()
         if torch.cuda.is_available():
@@ -345,7 +345,7 @@ for epoch in range(args.epochs):
         if args.defense == 'at' or args.defense == 'colorat':
             outputs, loss = MadrysLoss(epsilon=args.std / 255, distance="L_inf")(
                 net, inputs, labels, optimizer
-            )            
+            )
         else:
             outputs = net(inputs)
             loss, _ = standard_loss(args, net, inputs, labels)
@@ -357,12 +357,12 @@ for epoch in range(args.epochs):
         loss.backward()
         optimizer.step()
 
-    print('[Epoch：%d/%d] loss: %.3f Train Acc: %.3f' % (epoch + 1, args.epochs, running_loss / len(train_loader), 100. * correct / total)) 
+    print('[Epoch：%d/%d] loss: %.3f Train Acc: %.3f' % (epoch + 1, args.epochs, running_loss / len(train_loader), 100. * correct / total))
     running_loss = 0.0
 
-    if (epoch + 1) % 5 == 0: 
-        # start_time = time.time() 
-        
+    if (epoch + 1) % 5 == 0:
+
+
         net.eval()
         correct = 0
         total = 0
@@ -373,13 +373,13 @@ for epoch in range(args.epochs):
             _, predicted = outputs.max(1)
             total += labels.size(0)
             correct += predicted.eq(labels).sum().item()
-        print('Test Acc: %.2f' % (100. * correct / total)) 
+        print('Test Acc: %.2f' % (100. * correct / total))
 
 
-        # end_time = time.time()
-        # print(f"The total running time is: {(end_time - start_time) / 3600:.4f} hours")
+
+
 
 with open(os.path.join(f'results.csv'), 'a') as csvfile:
     csvwriter = csv.writer(csvfile)
-    csvwriter.writerow([args.arch, args.ue, args.seed, args.shift, args.std, args.defense, 100 * correct / total])  
+    csvwriter.writerow([args.arch, args.ue, args.seed, args.shift, args.std, args.defense, 100 * correct / total])
 print('Finished Training')

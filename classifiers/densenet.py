@@ -50,26 +50,26 @@ class _Transition(nn.Sequential):
 
 
 class DenseNet(nn.Module):
-    r"""Densenet-BC model class, based on
-    `"Densely Connected Convolutional Networks" <https://arxiv.org/pdf/1608.06993.pdf>`_
-    Args:
-        growth_rate (int) - how many filters to add each layer (`k` in paper)
-        block_config (list of 4 ints) - how many layers in each pooling block
-        num_init_features (int) - the number of filters to learn in the first convolution layer
-        bn_size (int) - multiplicative factor for number of bottle neck layers
-          (i.e. bn_size * k features in the bottleneck layer)
-        drop_rate (float) - dropout rate after each dense layer
-        num_classes (int) - number of classification classes
-    """
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+
 
     def __init__(self, growth_rate=32, block_config=(6, 12, 24, 16),
                  num_init_features=64, bn_size=4, drop_rate=0, num_classes=10):
 
         super(DenseNet, self).__init__()
 
-        # First convolution
-        
-        # CIFAR-10: kernel_size 7 ->3, stride 2->1, padding 3->1
+
+
+
         self.features = nn.Sequential(OrderedDict([
             ('conv0', nn.Conv2d(3, num_init_features, kernel_size=3, stride=1,
                                 padding=1, bias=False)),
@@ -77,9 +77,9 @@ class DenseNet(nn.Module):
             ('relu0', nn.ReLU(inplace=True)),
             ('pool0', nn.MaxPool2d(kernel_size=3, stride=2, padding=1)),
         ]))
-        ## END
 
-        # Each denseblock
+
+
         num_features = num_init_features
         for i, num_layers in enumerate(block_config):
             block = _DenseBlock(num_layers=num_layers, num_input_features=num_features,
@@ -93,13 +93,13 @@ class DenseNet(nn.Module):
                 self.features.add_module('transition%d' % (i + 1), trans)
                 num_features = num_features // 2
 
-        # Final batch norm
+
         self.features.add_module('norm5', nn.BatchNorm2d(num_features))
 
-        # Linear layer
+
         self.classifier = nn.Linear(num_features, num_classes)
 
-        # Official init from torch repo.
+
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight)
@@ -126,12 +126,12 @@ def _densenet(arch, growth_rate, block_config, num_init_features, pretrained, pr
 
 
 def densenet121(pretrained=False, progress=True, device='cpu', **kwargs):
-    r"""Densenet-121 model from
-    `"Densely Connected Convolutional Networks" <https://arxiv.org/pdf/1608.06993.pdf>`_
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-        progress (bool): If True, displays a progress bar of the download to stderr
-    """
+\
+\
+\
+\
+\
+
     return _densenet('densenet121', 32, (6, 12, 24, 16), 64, pretrained, progress, device,
                      **kwargs)
 
@@ -139,34 +139,34 @@ DenseNet121 = densenet121
 
 
 def densenet161(pretrained=False, progress=True, device='cpu', **kwargs):
-    r"""Densenet-161 model from
-    `"Densely Connected Convolutional Networks" <https://arxiv.org/pdf/1608.06993.pdf>`_
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-        progress (bool): If True, displays a progress bar of the download to stderr
-    """
+\
+\
+\
+\
+\
+
     return _densenet('densenet161', 48, (6, 12, 36, 24), 96, pretrained, progress, device,
                      **kwargs)
 
 
 def densenet169(pretrained=False, progress=True, device='cpu', **kwargs):
-    r"""Densenet-169 model from
-    `"Densely Connected Convolutional Networks" <https://arxiv.org/pdf/1608.06993.pdf>`_
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-        progress (bool): If True, displays a progress bar of the download to stderr
-    """
+\
+\
+\
+\
+\
+
     return _densenet('densenet169', 32, (6, 12, 32, 32), 64, pretrained, progress, device,
                      **kwargs)
 
 
 def densenet201(pretrained=False, progress=True, device='cpu', **kwargs):
-    r"""Densenet-201 model from
-    `"Densely Connected Convolutional Networks" <https://arxiv.org/pdf/1608.06993.pdf>`_
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-        progress (bool): If True, displays a progress bar of the download to stderr
-    """
+\
+\
+\
+\
+\
+
     return _densenet('densenet201', 32, (6, 12, 48, 32), 64, pretrained, progress, device,
                      **kwargs)
 

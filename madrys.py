@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 
 class MadrysLoss(nn.Module):
-    """PGD adversarial-training loss used by the `at` and `colorat` defenses."""
+
 
     def __init__(
         self,

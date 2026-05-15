@@ -47,7 +47,7 @@ class LogProcessBar():
 
     def refresh(self, current, total, mode, msg=None):
         if current == 0:
-            self.begin_time = time.time()  # Reset for new bar.
+            self.begin_time = time.time()
 
         cur_time = time.time()
         step_time = cur_time - self.last_time
@@ -80,7 +80,7 @@ begin_time = time.time()
 def progress_bar( current, total, mode, msg=None):
     global last_time,begin_time
     if current == 0:
-        begin_time = time.time()  # Reset for new bar.
+        begin_time = time.time()
 
     cur_time = time.time()
     step_time = cur_time - last_time

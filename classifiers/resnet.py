@@ -91,13 +91,13 @@ class ResNet(nn.Module):
         out = self.linear(out)
         return out
 
-    # def adv_forward(self, x):
-    #     out = F.relu(self.bn1(self.conv1(x)))
-    #     out = self.layer1(out)
-    #     out = self.layer2(out)
-    #     out = self.layer3(out)
-    #     out = self.layer4(out)
-    #     return out
+
+
+
+
+
+
+
 
     def feature_extract(self, x):
         out = F.relu(self.bn1(self.conv1(x)))
@@ -140,8 +140,8 @@ class WRN(nn.Module):
         out = self.layer1(out)
         out = self.layer2(out)
         out = self.layer3(out)
-        # out = F.avg_pool2d(out, 8)
-        # out = out.view(out.shape[0], -1)
+
+
         out = self.avgpool(out)
         out = torch.flatten(out, 1)
         out = self.linear(out)

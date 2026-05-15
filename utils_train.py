@@ -9,7 +9,7 @@ import torchvision.models as models
 from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as transforms
 import torchvision
-import os 
+import os
 import numpy as np
 import torch
 import torch.nn as nn
@@ -21,27 +21,27 @@ import pdb
 
 
 
-# with open("./UEs/ue_cifar10.pkl", 'rb') as f:
-#     data = pickle.load(f) 
-#     print(len(data)) # 样本条数 
-#     img_data, label = data[0]
-#     img_data.type
 
 
 
-# class cifar10_training_data(Dataset):
-#     def __init__(self, data_file, transform=None):
-#         with open(data_file, 'rb') as f:
-#             self.data = pickle.load(f)
-#         self.transform = transform
-#     def __len__(self):
-#         return len(self.data)
 
-#     def __getitem__(self, idx):
-#         img_data, label = self.data[idx] 
-#         img_data = img_data.transpose(1, 2, 0)*255
-#         img = Image.fromarray(img_data.clip(0, 255).astype(np.uint8))
-#         return self.transform(img), torch.tensor(label)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -82,7 +82,7 @@ class cifar10_training_data(Dataset):
 
 
 
- 
+
 def add_random_gaussian_noise(tensor, std=0.1):
     noise = torch.randn_like(tensor) * std
     noisy_tensor = torch.clamp(tensor + noise, 0, 1)
@@ -94,13 +94,13 @@ def standard_loss(args, model, x, y):
     return loss, logits
 
 def same_seeds(seed):
-    torch.manual_seed(seed)   
-    if torch.cuda.is_available():  
-        torch.cuda.manual_seed(seed)  
-        torch.cuda.manual_seed_all(seed)   
-    np.random.seed(seed)  
-    torch.backends.cudnn.benchmark = False   
-    torch.backends.cudnn.deterministic = True   
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+    np.random.seed(seed)
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
 
 def dict2namespace(config):
     namespace = argparse.Namespace()
@@ -112,8 +112,7 @@ def dict2namespace(config):
         setattr(namespace, key, new_value)
     return namespace
 
- 
 
- 
- 
- 
+
+
+
