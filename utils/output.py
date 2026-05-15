@@ -1,6 +1,7 @@
 import time
 import datetime
 
+
 def format_time(seconds):
     days = int(seconds / 3600 / 24)
     seconds = seconds - days * 3600 * 24
@@ -11,7 +12,6 @@ def format_time(seconds):
     secondsf = int(seconds)
     seconds = seconds - secondsf
     millis = int(seconds * 1000)
-
     f = ''
     i = 1
     if days > 0:
@@ -33,7 +33,8 @@ def format_time(seconds):
         f = '0ms'
     return f
 
-class LogProcessBar():
+
+class LogProcessBar:
     def __init__(self, logfile, args):
         self.last_time = time.time()
         self.begin_time = time.time()
@@ -43,23 +44,20 @@ class LogProcessBar():
 
     def log(self, msg):
         with open(self.logfile, 'a') as f:
-            f.write(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '\t' + msg + '\n')
+            f.write(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\t' + msg + '\n')
 
     def refresh(self, current, total, mode, msg=None):
         if current == 0:
             self.begin_time = time.time()
-
         cur_time = time.time()
         step_time = cur_time - self.last_time
         self.last_time = cur_time
         tot_time = cur_time - self.begin_time
-
         L = []
-        L.append("[{:>3d}/{:<3d}]".format(current + 1, total))
-        L.append(" {} |".format(mode.center(6)))
+        L.append('[{:>3d}/{:<3d}]'.format(current + 1, total))
+        L.append(' {} |'.format(mode.center(6)))
         L.append(' Step:{}'.format(format_time(step_time).ljust(6)))
         L.append('| Tot:{}'.format(format_time(tot_time).ljust(8)))
-
         if msg:
             L.append(' | ' + msg)
         msg = ''.join(L)
@@ -68,31 +66,26 @@ class LogProcessBar():
         elif current == total - 1:
             print('\r', msg)
             with open(self.logfile, 'a') as f:
-                f.write(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+'\t'+msg+'\n')
+                f.write(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\t' + msg + '\n')
         else:
             raise NotImplementedError
-
-
-
 last_time = time.time()
 begin_time = time.time()
 
-def progress_bar( current, total, mode, msg=None):
-    global last_time,begin_time
+
+def progress_bar(current, total, mode, msg=None):
+    global last_time, begin_time
     if current == 0:
         begin_time = time.time()
-
     cur_time = time.time()
     step_time = cur_time - last_time
     last_time = cur_time
     tot_time = cur_time - begin_time
-
     L = []
-    L.append("[{:>3d}/{:<3d}]".format(current + 1, total))
-    L.append(" {} |".format(mode.center(6)))
+    L.append('[{:>3d}/{:<3d}]'.format(current + 1, total))
+    L.append(' {} |'.format(mode.center(6)))
     L.append(' Step:{}'.format(format_time(step_time).ljust(6)))
     L.append('| Tot:{}'.format(format_time(tot_time).ljust(8)))
-
     if msg:
         L.append(' | ' + msg)
     msg = ''.join(L)
@@ -100,7 +93,3 @@ def progress_bar( current, total, mode, msg=None):
         print('\r', msg, end='')
     elif current == total - 1:
         print('\r', msg)
-
-
-
-

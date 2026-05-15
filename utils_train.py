@@ -20,34 +20,6 @@ import io
 import pdb
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 class cifar10_training_data(Dataset):
     def __init__(self, data_file, transform=None):
         with open(data_file, 'rb') as f:
@@ -59,28 +31,19 @@ class cifar10_training_data(Dataset):
 
     def __getitem__(self, idx):
         img_data, label = self.data[idx]
-
         if isinstance(img_data, bytes):
             img = Image.frombytes('RGB', (32, 32), img_data)
             img = img.convert('RGB')
-
         else:
             if torch.is_tensor(img_data):
                 img_data = img_data.cpu().numpy()
-
             img_data = np.array(img_data)
             img_data = img_data.transpose(1, 2, 0) * 255
             img_data = img_data.astype(np.uint8)
             img = Image.fromarray(img_data.clip(0, 255).astype(np.uint8))
-
         if self.transform is not None:
             img = self.transform(img)
-
-        return img, torch.tensor(label)
-
-
-
-
+        return (img, torch.tensor(label))
 
 
 def add_random_gaussian_noise(tensor, std=0.1):
@@ -88,10 +51,12 @@ def add_random_gaussian_noise(tensor, std=0.1):
     noisy_tensor = torch.clamp(tensor + noise, 0, 1)
     return noisy_tensor
 
+
 def standard_loss(args, model, x, y):
     logits = model(x)
     loss = nn.CrossEntropyLoss()(logits, y)
-    return loss, logits
+    return (loss, logits)
+
 
 def same_seeds(seed):
     torch.manual_seed(seed)
@@ -102,6 +67,7 @@ def same_seeds(seed):
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
 
+
 def dict2namespace(config):
     namespace = argparse.Namespace()
     for key, value in config.items():
@@ -111,8 +77,3 @@ def dict2namespace(config):
             new_value = value
         setattr(namespace, key, new_value)
     return namespace
-
-
-
-
-
